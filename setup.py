@@ -25,7 +25,7 @@ setup(
      description="Amazing conversation recognition package",
      long_description=long_description,
      long_description_content_type="text/markdown",
-     url="https://github.com/SUS-SS2022/template",
+     url="https://github.com/SUS-SS2022/conv-recognition",
      packages=find_packages(),
      install_requires=install_requires
 )
