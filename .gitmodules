@@ -1,0 +1,3 @@
+[submodule "extern/6DRepNet"]
+	path = extern/6DRepNet
+	url = git@github.com:thohemp/6DRepNet.git
