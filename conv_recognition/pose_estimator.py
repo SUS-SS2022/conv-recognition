@@ -5,7 +5,8 @@ import torch
 from PIL import Image
 import conv_recognition.utils as utils
 import numpy as np
-import copy
+from copy import copy
+
 class PoseEstimator:
 
     def __init__(self, gpu=0, snapshot_path='data/models/6DRepNet_300W_LP_AFLW2000.pth'):
@@ -29,7 +30,7 @@ class PoseEstimator:
 
     def get_poses(self, frame):
         faces = self.detector(frame)
-        results = []
+        head_poses = []
         with torch.no_grad():
             for box, landmarks, score in faces:
                 if score < 0.95:
@@ -64,10 +65,10 @@ class PoseEstimator:
                 center_x = x_min + int(.5*(x_max-x_min))
                 center_y = y_min + int(.5*(y_max-y_min))
 
-                results.append((center_x, center_y, bbox_width, yaw, pitch, roll))
-        return results
+                head_poses.append((center_x, center_y, bbox_width, yaw, pitch, roll))
+        return head_poses
 
-    def draw_results(self, frame, head_poses):
+    def draw_head_poses(self, frame, head_poses):
         frame = copy(frame)
         for center_x, center_y, size, yaw, pitch, roll in head_poses:
             utils.plot_pose_cube(
