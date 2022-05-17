@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Tuple
 from torchvision import transforms
 import torch
 from conv_recognition.model import SixDRepNet
@@ -11,6 +11,7 @@ import cv2
 from math import cos, sin
 from copy import copy
 
+
 class HeadPose(NamedTuple):
     center_x: float
     center_y: float
@@ -19,6 +20,7 @@ class HeadPose(NamedTuple):
     yaw: float
     pitch: float
     roll: float
+
 
 class PoseEstimator:
 
@@ -78,39 +80,63 @@ class PoseEstimator:
                 center_x = x_min + int(.5*(x_max-x_min))
                 center_y = y_min + int(.5*(y_max-y_min))
 
-                head_poses.append(HeadPose(center_x, center_y, bbox_width, bbox_height, yaw, pitch, roll))
+                head_poses.append(
+                    HeadPose(center_x, center_y, bbox_width, bbox_height, yaw, pitch, roll))
         return head_poses
 
-    def draw_viewing_direction(self, frame, head_poses: List[HeadPose]):
-        frame = copy(frame)
-        for hp in head_poses:
+    def draw_viewing_direction(
+            self,
+            frame: np.ndarray,
+            head_poses: List[HeadPose],
+            inplace: bool = False,
+            colors: List[Tuple[int, int, int]] = None):
+
+        if colors == None:
+            colors = [(0, 0, 255) for _ in head_poses]
+
+        if not inplace:
+            frame = copy(frame)
+
+        for i, hp in enumerate(head_poses):
             p = hp.pitch * np.pi / 180
             y = -(hp.yaw * np.pi / 180)
             r = hp.roll * np.pi / 180
-            xm = 100 * sin(y) + hp.center_x
-            ym = 100 * (-cos(y) * sin(p)) + hp.center_y
-            cv2.arrowedLine(frame, (int(hp.center_x), int(hp.center_y)), (int(xm), int(ym)), (255, 255, 255), 5)
+            length = frame.shape[1]/10
+            xm = length * sin(y) + hp.center_x
+            ym = length * (-cos(y) * sin(p)) + hp.center_y
+            cv2.arrowedLine(frame, (int(hp.center_x), int(
+                hp.center_y)), (int(xm), int(ym)), colors[i], 5)
+
         return frame
 
-    def draw_bbox(self, frame, head_poses: List[HeadPose]):
-        frame = copy(frame)
-        for hp in head_poses:
+    def draw_bbox(
+            self,
+            frame,
+            head_poses: List[HeadPose],
+            inplace=False,
+            colors: List[Tuple[int, int, int]] = None):
+        if colors == None:
+            colors = [(0, 0, 255) for _ in head_poses]
+        if not inplace:
+            frame = copy(frame)
+        for i, hp in enumerate(head_poses):
             x_min = int(hp.center_x-hp.bbox_width/2)
             x_max = int(hp.center_x+hp.bbox_width/2)
             y_min = int(hp.center_y-hp.bbox_height/2)
             y_max = int(hp.center_y+hp.bbox_height/2)
-            cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0,255,0), 3)
+            cv2.rectangle(frame, (x_min, y_min),
+                          (x_max, y_max), colors[i], 3)
         return frame
 
-
-    def draw_head_poses(self, frame: np.ndarray, head_poses: List[HeadPose]):
-        frame = copy(frame)
+    def draw_head_poses(self, frame: np.ndarray, head_poses: List[HeadPose], inplace=False):
+        if not inplace:
+            frame = copy(frame)
         for hp in head_poses:
             utils.plot_pose_cube(
-                    frame,  
-                    hp.center_x, hp.center_y,
-                    hp.yaw, hp.pitch, hp.roll,
-                    hp.bbox_width)
+                frame,
+                hp.center_x, hp.center_y,
+                hp.yaw, hp.pitch, hp.roll,
+                hp.bbox_width)
         return frame
 
     def get_looking_direction(self, frame):
