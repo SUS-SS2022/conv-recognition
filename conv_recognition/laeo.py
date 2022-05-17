@@ -65,9 +65,8 @@ def assign_colors(head_poses, laeo):
     for i1, i2 in laeo:
         colors[i1] = laeo_colors[counter]
         colors[i2] = laeo_colors[counter]
-        counter += 1
+        counter += 1 % len(laeo_colors)
     return colors
-
 
 
 def get_colors(head_poses):

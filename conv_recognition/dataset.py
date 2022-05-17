@@ -24,4 +24,5 @@ class UcoDataset(Dataset):
         label = self.img_labels[idx]
         return image, label
         
-        
+class LAEODataset(Dataset):
+    pass
