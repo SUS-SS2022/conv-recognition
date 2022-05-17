@@ -20,23 +20,23 @@ def intersect(x_min, x_max, y_min, y_max, origin_x, origin_y, ray_x, ray_y):
 
         tmin = max(tmin, min(ty1, ty2))
         tmax = min(tmax, max(ty1, ty2))
-
-    return tmax >= tmin
+    return tmax >= tmin and tmax > 0.0
 
 def find_intersections(head_poses: HeadPose):
     intersections = []
     for i, hp in enumerate(head_poses):
         p = hp.pitch * np.pi / 180
         y = -(hp.yaw * np.pi / 180)
-        for j, hp in enumerate(head_poses):
+        ray_dir = np.array([sin(y), (-cos(y) * sin(p))])
+        ray_dir /= norm(ray_dir)
+
+        for j, hp2 in enumerate(head_poses):
             if i==j:
                 continue
-            x_min = hp.center_x-hp.bbox_width/2
-            x_max = hp.center_x+hp.bbox_width/2
-            y_min = hp.center_y-hp.bbox_height/2
-            y_max = hp.center_y+hp.bbox_height/2
-            ray_dir = np.array([sin(y), (-cos(y) * sin(p))])
-            ray_dir /= norm(ray_dir)
+            x_min = hp2.center_x-hp2.bbox_width/2
+            x_max = hp2.center_x+hp2.bbox_width/2
+            y_min = hp2.center_y-hp2.bbox_height/2
+            y_max = hp2.center_y+hp2.bbox_height/2
             if intersect(x_min, x_max, y_min, y_max, hp.center_x, hp.center_y, ray_dir[0], ray_dir[1]):
                 intersections.append((i, j))
     return intersections
@@ -67,6 +67,8 @@ def assign_colors(head_poses, laeo):
         colors[i2] = laeo_colors[counter]
         counter += 1
     return colors
+
+
 
 def get_colors(head_poses):
     intersections = find_intersections(head_poses)
