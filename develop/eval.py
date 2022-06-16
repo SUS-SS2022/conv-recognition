@@ -7,7 +7,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def calc_metrics(prediction_path, label_path):
-
     results = []
 
     scenes = os.listdir(prediction_path)
@@ -65,14 +64,16 @@ if __name__ == '__main__':
     label_path = args.labels
     sota_path = args.sota
 
-    laeo_net_df = calc_metrics(prediction_path, label_path)
+    laeo_net_df = calc_metrics(sota_path, label_path)
     laeo_net_df['type'] = 'sota'
 
-    pred_df = calc_metrics(sota_path, label_path)
+    pred_df = calc_metrics(prediction_path, label_path)
     pred_df['type'] = 'own'
 
     df = pd.concat([pred_df, laeo_net_df])
     df.to_csv(f'{args.path}/eval.csv', index=False)
+
+    print(df)
 
     fig = sns.catplot(data=df, x='type', y='accuracy', col='scene', kind='bar', height=4, aspect=.7)
     plt.show()
