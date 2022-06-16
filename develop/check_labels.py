@@ -1,45 +1,59 @@
-import sys
-sys.path.append('.')
-
 import argparse
-import os
 import cv2
 import cv2 
 from conv_recognition.pose_estimator import PoseEstimator
-from conv_recognition.laeo import find_laeo, find_intersections
-from tqdm import tqdm
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Label images with laeo detector')
     parser.add_argument('video',
                         help='source video/image folder')
-    parser.add_argument('prediction', required=False,
-                        help='path for prediction')
     parser.add_argument('dst',
                         help='destination folder for results')
-    parser.add_argument('--video', required=False,
-                        help='if set, create video at given path')
-    
+    parser.add_argument('--prediction',
+                        help='path for prediction')
+
     args = parser.parse_args()
 
-    if os.path.exists(args.dst):
-        os.remove(args.dst)
-
     f = open(args.dst, 'w+')
-    file_names = os.listdir(args.source)
-    file_names.sort()
+    if args.prediction:
+        with open(args.prediction, 'r') as file:
+            predictions = [line.split(' ') for line in file.readlines()]
+            predictions = [f'{name} {label}' for name, label in predictions]
 
     estimator = PoseEstimator()
 
+    cap = cv2.VideoCapture(args.video)
+
+    fontScale = 1
+    color = (255, 0, 0)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    thickness = 2
+    org = (0, 50)
+
     counter = 0
-    for file_name in tqdm(file_names):
-        frame = cv2.imread(f'{args.source}/{file_name}')
-        head_poses = estimator.get_poses(frame)
-        intersections = find_intersections(head_poses)
-        laeo = find_laeo(intersections)
-        label = 1 if laeo else 0
-        f.write(f'{counter:05d}.jpg {label}\n')
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if args.prediction:
+            prediction = predictions[counter]
+            frame = cv2.putText(frame, prediction, org, font, 
+                       fontScale, color, thickness, cv2.LINE_AA)
+        if not ret:
+            break
+        cv2.imshow('frame', frame)
+        key = cv2.waitKey(0)
+        if key & 0xFF == ord('q'):
+            break
+        elif key & 0xFF == ord('y'):
+            label = 1
+        else:
+            label = 0
+        f.write(f'{counter} {label}\n')
         f.flush()
         counter+=1
     f.close()
+
+        
+
+
+    

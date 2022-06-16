@@ -1,11 +1,8 @@
-import sys
 import cv2 
-sys.path.append('.')
 from conv_recognition.pose_estimator import PoseEstimator
 from conv_recognition.laeo import get_colors
 
-path = 'data/scenes/scene2.mp4'
-cap = cv2.VideoCapture(path)
+cap = cv2.VideoCapture(0)
 
 estimator = PoseEstimator()
 
@@ -27,5 +24,3 @@ while cap.isOpened():
         break
 
 cap.release()
-
-

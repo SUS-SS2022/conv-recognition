@@ -138,6 +138,3 @@ class PoseEstimator:
                 hp.yaw, hp.pitch, hp.roll,
                 hp.bbox_width)
         return frame
-
-    def get_looking_direction(self, frame):
-        return

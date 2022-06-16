@@ -1,28 +1,37 @@
-import torch
-from torch.utils.data import Dataset
+import cv2
 import numpy as np
-import os
-from torchvision.io import read_image
+import glob
 
-class UcoDataset(Dataset):
 
-    def __init__(self, img_dir, sequence, transform=None, target_transform=None):
-        self.img_dir = img_dir
-        self.sequence = sequence
-        self.img_labels = []
-        self.path = f'{img_dir}/sequence/'
-        with open(os.path.join(img_dir,'annotations','annotations_frame', f'{sequence}.txt'), 'r') as f:
-            lines = f.readlines()
-            self.img_labels = [line.split(' ')[1] for line in lines]
+class Dataset():
 
-    def __len__(self):
-        return len(self.img_labels)
+    def __init__(self, path: str):
+        if path.endswith(('.mp4', '.avi')):
+            self.cap = cv2.VideoCapture(path)
+            self.length = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            self.video = True
+        else:
+            ext = ['png', 'jpg']
+            files = []
+            self.image_paths = [files.extend(glob.glob(path + '*.' + e)) for e in ext]
+            self.length = len(self.image_paths)
+            self.video = False
+    
 
-    def __getitem__(self, idx):
-        img_path = os.path.join(self.img_dir, 'frames', self.sequence, f'{idx:06d}.jpg')
-        image = read_image(img_path)
-        label = self.img_labels[idx]
-        return image, label
+    def __len__(self) -> int:
+        return self.length
+
+    def __iter__(self) -> np.ndarray:
+        if self.video:
+            while self.cap.isOpened():
+                ret, frame = self.cap.read()
+                if ret:
+                    yield frame
+                else:
+                    break
+        else:
+            for i in range(len(self)):
+                path = self.image_paths[i]
+                frame = cv2.imread(path)
+                yield frame
         
-class LAEODataset(Dataset):
-    pass

@@ -125,9 +125,6 @@ def get_pt2d_from_mat(mat_path):
     pt2d = mat['pt2d']
     return pt2d
 
-# batch*n
-
-
 def normalize_vector(v, use_gpu=True):
     batch = v.shape[0]
     v_mag = torch.sqrt(v.pow(2).sum(1))  # batch
