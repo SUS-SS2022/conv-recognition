@@ -8,14 +8,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Label images with laeo detector')
     parser.add_argument('video',
                         help='source video/image folder')
-    parser.add_argument('dst',
+    parser.add_argument('destination',
                         help='destination folder for results')
     parser.add_argument('--prediction',
                         help='path for prediction')
 
     args = parser.parse_args()
 
-    f = open(args.dst, 'w+')
+    f = open(args.destination, 'w+')
+
     if args.prediction:
         with open(args.prediction, 'r') as file:
             predictions = [line.split(' ') for line in file.readlines()]
