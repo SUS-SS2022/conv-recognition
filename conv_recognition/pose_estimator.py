@@ -24,22 +24,31 @@ class HeadPose(NamedTuple):
 
 class PoseEstimator:
 
-    def __init__(self, gpu=0, snapshot_path='data/models/6DRepNet_300W_LP_AFLW2000.pth'):
+    def __init__(self, gpu=0, snapshot_path='6DRepNet_300W_LP_AFLW2000.pth'):
         self.transformations = transforms.Compose([transforms.Resize(224),
                                                    transforms.CenterCrop(224),
                                                    transforms.ToTensor(),
                                                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-        self.detector = RetinaFace(gpu_id=gpu)
+        cuda_available = torch.cuda.is_available()
+        self.use_gpu = cuda_available
+        if not cuda_available:
+            print('Cuda is not available, inference might be slow...')
+        self.device =  torch.device('cuda' if cuda_available else 'cpu')
+        if cuda_available:
+            self.detector = RetinaFace(gpu_id=gpu)
+        else:
+            self.detector = RetinaFace()
         self.model = SixDRepNet(backbone_name='RepVGG-B1g2',
                                 backbone_file='',
                                 deploy=True,
-                                pretrained=False)
+                                pretrained=False,
+                                use_gpu=cuda_available)
         saved_state_dict = torch.load(snapshot_path, map_location='cpu')
         if 'model_state_dict' in saved_state_dict:
             self.model.load_state_dict(saved_state_dict['model_state_dict'])
         else:
             self.model.load_state_dict(saved_state_dict)
-        self.model.cuda(gpu)
+        self.model.to(self.device) # cuda(gpu)
         self.model.eval()
         self.gpu = gpu
 
@@ -67,11 +76,11 @@ class PoseEstimator:
                 img = img.convert('RGB')
                 img = self.transformations(img)
 
-                img = torch.Tensor(img[None, :]).cuda(self.gpu)
+                img = torch.Tensor(img[None, :]).to(self.device) # cuda(self.gpu)
 
                 pred = self.model(img)
                 euler = utils.compute_euler_angles_from_rotation_matrices(
-                    pred)*180/np.pi
+                    pred, use_gpu=self.use_gpu)*180/np.pi
 
                 pitch = euler[:, 0].cpu().item()
                 yaw = euler[:, 1].cpu().item()

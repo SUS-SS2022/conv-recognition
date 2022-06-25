@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+
 import cv2 
 from conv_recognition.pose_estimator import PoseEstimator
 

@@ -16,11 +16,23 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
+Next, install the correct version for pytorch.
+Use following command to run it on the cpu:
+
+```
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+
 then, use following command to install the requirements:
 
 ```
-pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu113
+pip install -r requirements.txt
 ```
+
+Download the [6DRepNet model](https://drive.google.com/file/d/1vPNtVu_jg2oK-RiIWakxYyfLPA9rU4R4/view?usp=sharing) from google drive and move it to the root of this working directory.
+You can download our datasets and results [here](https://drive.google.com/drive/folders/1u_RM9XGGWpq856h1CHPBL7rCggHjBDF5?usp=sharing).
+
 ## Usage
 
 To make predictions use the predict.py script in the develop folder.

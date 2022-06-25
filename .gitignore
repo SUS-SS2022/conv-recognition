@@ -161,3 +161,5 @@ cython_debug/
 data/
 __pycache__/
 *.pyc
+*.pth
+.vscode

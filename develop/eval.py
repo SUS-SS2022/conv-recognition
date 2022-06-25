@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+
 import pandas as pd
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, accuracy_score
@@ -9,10 +12,20 @@ import matplotlib.pyplot as plt
 def calc_metrics(prediction_path, label_path):
     results = []
 
-    scenes = os.listdir(prediction_path)
+    scenes = os.listdir(label_path)
     scenes.sort()
 
     for scene in scenes:    
+
+        label_exist = False
+        with open(f'{label_path}/{scene}', 'r') as f:
+            labels = f.readlines()
+            labels = np.array([int(l.split(' ')[1]) for l in labels])
+            label_exist = True
+
+        if not label_exist:
+            continue
+
         pred_exist = False
 
         with open(f'{prediction_path}/{scene}', 'r') as f:
@@ -23,14 +36,6 @@ def calc_metrics(prediction_path, label_path):
         if not pred_exist:
             continue
         
-        label_exist = False
-        with open(f'{label_path}/{scene}', 'r') as f:
-            labels = f.readlines()
-            labels = np.array([int(l.split(' ')[1]) for l in labels])
-            label_exist = True
-
-        if not label_exist:
-            continue
 
         predictions = np.concatenate([predictions, np.zeros(len(labels)-len(predictions))])
 
