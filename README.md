@@ -1,15 +1,15 @@
-# Conversation Recongition
+# Conversation Recognition
 This repository contains the work for the lecture Scene Understanding & Surveillance (SUS) 2022.
-We detect if people have a conversation by checking if people are looking at each other (LAEO) by using [6DRepNet](https://github.com/thohemp/6DRepNet/blob/master/README.MD) as basis.
+We detect if people have a conversation by checking if people are looking at each other (LAEO) by using [6DRepNet](https://github.com/thohemp/6DRepNet/blob/master/README.MD) as the basis.
 It contains scripts to predict, evaluate and check if people are looking at each other in the develop folder and real-time inference with your webcam in the demo folder.
 
 [![LAEO-Video](images/thumbnail.png)](https://youtu.be/DTOmYopRU7Q)
 
 ## Installation
 
-This project was created and tested with python version 3.8.13, torch 1.11 with cuda support on arch linux.
+This project was created and tested with python version 3.8.13, torch 1.11 with Cuda 11.3 support on arch Linux.
 
-In order to run it, create a virtual environment and activate it using
+To run it, create a virtual environment and activate it using
 
 ```
 python -m venv .venv
@@ -17,21 +17,29 @@ source .venv/bin/activate
 ```
 
 Next, install the correct version for pytorch.
-Use following command to run it on the cpu:
+Use the following command to run it on the CPU:
 
 ```
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
+If you have an NVidia GPU compatible with torch 1.11, you can use the following command to utilize the GPU:
 
-then, use following command to install the requirements:
+```
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+```
+
+If your Cuda version is incompatible, you might be able to install PyTorch according to [official website](https://pytorch.org/get-started/locally/).
+However, we only tested this repository with the previously mentioned ones.
+
+Use the following command to install the rest of the requirements:
 
 ```
 pip install -r requirements.txt
 ```
 
 Download the [6DRepNet model](https://drive.google.com/file/d/1vPNtVu_jg2oK-RiIWakxYyfLPA9rU4R4/view?usp=sharing) from google drive and move it to the root of this working directory.
-You can download our datasets and results [here](https://drive.google.com/drive/folders/1u_RM9XGGWpq856h1CHPBL7rCggHjBDF5?usp=sharing).
+Additionally, you can download our datasets and results [here](https://drive.google.com/drive/folders/1u_RM9XGGWpq856h1CHPBL7rCggHjBDF5?usp=sharing).
 
 ## Usage
 
@@ -43,18 +51,18 @@ python develop/predict.py data/scenes/scene2.mp4 --prediction pred.txt --vispath
 where
  - ```--prediction``` path to store the prediction per frame
  - ```--vispath``` if given stores the visualization at this path
- - ```--vis``` if enabled visualizes the prediction during runtime
+ - ```--vis``` if enabled, visualizes the prediction during runtime
 
-In order to label the data you can use following command:
+To label the data, you can use the following command:
 
 ```
 python develop/check.py video destination --prediction prediction
 ```
 
 where
- - ``video`` is the path to the video to check. You can use the visualisation created with predict.py to qualitatively check the prediction
+ - ``video`` is the path to the video to check. You can use the visualization created with predict.py to check the prediction qualitatively
 
-To calculate the accuracy, precision and recall as well as visualize them in a barplot you can run following command:
+To calculate the accuracy, precision, and recall, as well as visualize them in a barplot, you can run the following command:
 ```
 python develop/eval.py results predictions sota labels
 ```
@@ -64,16 +72,16 @@ where
  - *sota* is the directory that contains the state-of-the-art results
  - *labels* is the directory that contains the ground truth labels
 
-The predictions, sota and label files are expected to be named the same and contain a number and 1 for laeo and 0 for not laeo per line. Where one line corresponds to one frame in the video.
+The predictions, sota, and label files are expected to be named the same and contain a number and 1 for LAEO and 0 for not LAEO per line, where one line corresponds to one frame in the video.
 
 ## Demo
 
-Following command allows running head pose detection with a webcam:
+The following command allows running head pose detection with a webcam:
 ```
 python demo/pose.py
 ```
 
-and following command exectues LAEO detection with a webcam:
+and following command executes LAEO detection with a webcam:
 ```
 python demo/laeo.py
 ```
