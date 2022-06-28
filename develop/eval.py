@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 def calc_metrics(prediction_path, label_path):
     results = []
 
-    scenes = os.listdir(label_path)
+    label_files = os.listdir(label_path)
+    predictions_files = os.listdir(prediction_path)
+    scenes = list(set(label_files) & set(predictions_files))
     scenes.sort()
 
     for scene in scenes:    
@@ -35,7 +37,6 @@ def calc_metrics(prediction_path, label_path):
 
         if not pred_exist:
             continue
-        
 
         predictions = np.concatenate([predictions, np.zeros(len(labels)-len(predictions))])
 
