@@ -20,13 +20,13 @@ Next, install the correct version for pytorch.
 Use the following command to run it on the CPU:
 
 ```
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
 If you have an NVidia GPU compatible with torch 1.11, you can use the following command to utilize the GPU:
 
 ```
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 ```
 
 If your Cuda version is incompatible, you might be able to install PyTorch according to [official website](https://pytorch.org/get-started/locally/).
